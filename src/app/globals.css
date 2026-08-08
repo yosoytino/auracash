@@ -48,63 +48,7 @@ body {
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--electric) 35%, transparent);
 }
 
-/* ── Screen transitions ── */
-.screen-transition {
-  will-change: transform, opacity;
-}
-
-.screen-pre-enter-forward {
-  opacity: 0;
-  transform: translateX(28px);
-}
-
-.screen-pre-enter-back {
-  opacity: 0;
-  transform: translateX(-28px);
-}
-
-.screen-enter-forward {
-  animation: screen-forward 360ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-.screen-enter-back {
-  animation: screen-back 360ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-@keyframes screen-forward {
-  from {
-    opacity: 0;
-    transform: translateX(28px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes screen-back {
-  from {
-    opacity: 0;
-    transform: translateX(-28px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .screen-pre-enter-forward,
-  .screen-pre-enter-back {
-    opacity: 1;
-    transform: none;
-  }
-
-  .screen-enter-forward,
-  .screen-enter-back {
-    animation: none;
-  }
-
   .touch-press:active:not(:disabled) {
     transform: none;
   }
@@ -126,7 +70,7 @@ body {
   animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* ── Leaflet map styling ── */
+/* ── Leaflet map styling (Instacart-like: muted, minimal line detail) ── */
 .delivery-map {
   background: var(--surface-light);
   z-index: 0;
@@ -134,11 +78,21 @@ body {
 
 .delivery-map .leaflet-container {
   font-family: var(--font-inter), system-ui, sans-serif;
-  background: #dce3ec;
+  background: #eef1f5;
 }
 
+/* Soft wash over tiles to reduce visual noise from road/label lines */
 .delivery-map .leaflet-tile-pane {
-  filter: saturate(0.85) contrast(1.05) brightness(1.02);
+  filter: saturate(0.48) contrast(0.88) brightness(1.14);
+}
+
+.delivery-map::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: rgba(244, 246, 249, 0.42);
+  z-index: 401;
 }
 
 .delivery-map::after {
@@ -148,10 +102,33 @@ body {
   pointer-events: none;
   background: linear-gradient(
     180deg,
-    rgba(10, 37, 64, 0.08) 0%,
-    transparent 28%,
-    transparent 72%,
-    rgba(10, 37, 64, 0.12) 100%
+    rgba(10, 37, 64, 0.06) 0%,
+    transparent 30%,
+    transparent 70%,
+    rgba(10, 37, 64, 0.08) 100%
   );
-  z-index: 400;
+  z-index: 402;
+}
+
+/* Mapbox token present — slightly richer but still muted */
+.delivery-map--mapbox .leaflet-tile-pane {
+  filter: saturate(0.52) contrast(0.9) brightness(1.12);
+}
+
+.delivery-map--mapbox::before {
+  background: rgba(244, 246, 249, 0.38);
+}
+
+/* Carto Positron fallback — already minimal; extra soften */
+.delivery-map--minimal .leaflet-tile-pane {
+  filter: saturate(0.45) contrast(0.85) brightness(1.16);
+}
+
+.delivery-map--minimal::before {
+  background: rgba(244, 246, 249, 0.48);
+}
+
+.map-attribution {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  backdrop-filter: blur(4px);
 }

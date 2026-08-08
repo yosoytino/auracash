@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AuraCash — Autonomous Banking Concierge
 
-## Getting Started
+High-fidelity mobile-first prototype for autonomous cash delivery banking.
 
-First, run the development server:
+## Quick start
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Mapbox setup (optional but recommended)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The live transit tracker uses **OpenStreetMap by default**. For polished Mapbox styling, you need one thing from Mapbox:
 
-## Learn More
+### What to provide
 
-To learn more about Next.js, take a look at the following resources:
+| Variable | Required? | Where to get it |
+|---|---|---|
+| `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN` | Yes, for Mapbox | [mapbox.com/account/access-tokens](https://account.mapbox.com/access-tokens/) |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Setup steps
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Create a free account at [mapbox.com](https://www.mapbox.com/)
+2. Go to **Account → Access tokens**
+3. Copy your **Default public token** (starts with `pk.`)
+4. Create `.env.local` in the project root:
 
-## Deploy on Vercel
+```bash
+cp env.example .env.local
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+5. Paste your token:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```env
+NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=pk.your_token_here
+```
+
+6. Restart the dev server: `npm run dev`
+
+### Optional: custom map style
+
+Change the style in `.env.local`:
+
+```env
+NEXT_PUBLIC_MAPBOX_STYLE=mapbox/navigation-day-v1
+```
+
+Without a token, the app falls back to OpenStreetMap tiles automatically.
+
+## Features
+
+- **4-screen flow:** Dashboard → Assistant → Live Tracker → Delivery Complete
+- **Framer Motion** spring transitions between screens
+- **Haptic feedback** via Vibration API + visual press states
+- **54×54px touch targets** for motor accessibility
+- **Leaflet map** with Mapbox or OSM tiles
+- **Confetti burst** on delivery complete (respects reduced motion)
+
+## Tech stack
+
+Next.js (App Router) · TypeScript · Tailwind CSS · Lucide React · Framer Motion · Leaflet · canvas-confetti
