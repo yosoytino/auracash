@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { MapPin, ScanFace, ShieldAlert } from "lucide-react";
 import { DeliveryMap } from "@/components/map/delivery-map-loader";
+import { MapErrorBoundary } from "@/components/map/map-error-boundary";
+import { MapFallback } from "@/components/map/map-fallback";
 import { TouchTarget } from "@/components/ui/touch-target";
 import { DELIVERY_ADDRESS } from "@/lib/flow-state";
 import { interpolateRoute } from "@/lib/map-route";
@@ -15,20 +17,27 @@ type TrackerScreenProps = {
 
 const TOTAL_ETA_SECONDS = 12;
 const TRACK_DURATION_MS = 14000;
+const PROGRESS_TICK_MS = 120;
 
 export function TrackerScreen({ onCancel, onUnlock }: TrackerScreenProps) {
   const [progress, setProgress] = useState(0);
   const [etaSeconds, setEtaSeconds] = useState(TOTAL_ETA_SECONDS);
   const [isVerifying, setIsVerifying] = useState(false);
   const [hasSignaledArrival, setHasSignaledArrival] = useState(false);
+  const [mapReady, setMapReady] = useState(false);
 
   const hasArrived = progress >= 1;
   const vehiclePosition = interpolateRoute(progress);
 
   useEffect(() => {
+    const mountTimer = window.setTimeout(() => setMapReady(true), 300);
+    return () => window.clearTimeout(mountTimer);
+  }, []);
+
+  useEffect(() => {
     const startTime = Date.now();
 
-    const tick = () => {
+    const interval = window.setInterval(() => {
       const elapsed = Date.now() - startTime;
       const nextProgress = Math.min(elapsed / TRACK_DURATION_MS, 1);
       setProgress(nextProgress);
@@ -36,13 +45,12 @@ export function TrackerScreen({ onCancel, onUnlock }: TrackerScreenProps) {
         Math.max(0, Math.ceil(TOTAL_ETA_SECONDS * (1 - nextProgress))),
       );
 
-      if (nextProgress < 1) {
-        requestAnimationFrame(tick);
+      if (nextProgress >= 1) {
+        window.clearInterval(interval);
       }
-    };
+    }, PROGRESS_TICK_MS);
 
-    const frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
+    return () => window.clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -55,7 +63,7 @@ export function TrackerScreen({ onCancel, onUnlock }: TrackerScreenProps) {
   const handleBiometric = () => {
     triggerHaptic("heavy");
     setIsVerifying(true);
-    setTimeout(() => {
+    window.setTimeout(() => {
       triggerHaptic("success");
       setIsVerifying(false);
       onUnlock();
@@ -74,8 +82,14 @@ export function TrackerScreen({ onCancel, onUnlock }: TrackerScreenProps) {
       </header>
 
       <div className="relative flex-1 overflow-hidden bg-brand-navy/5">
-        <div className="relative mx-5 mt-6 aspect-[4/5] overflow-hidden rounded-3xl bg-white shadow-lg ring-1 ring-brand-navy/10">
-          <DeliveryMap progress={progress} hasArrived={hasArrived} />
+        <div className="relative mx-5 mt-6 aspect-[4/5] min-h-[280px] overflow-hidden rounded-3xl bg-white shadow-lg ring-1 ring-brand-navy/10">
+          <MapErrorBoundary progress={progress} hasArrived={hasArrived}>
+            {mapReady ? (
+              <DeliveryMap progress={progress} hasArrived={hasArrived} />
+            ) : (
+              <MapFallback progress={progress} hasArrived={hasArrived} />
+            )}
+          </MapErrorBoundary>
 
           <div
             className="pointer-events-none absolute left-1/2 z-[500] -translate-x-1/2 transition-all duration-300 ease-out"

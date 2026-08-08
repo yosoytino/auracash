@@ -47,7 +47,7 @@ export function DashboardScreen({ onScheduleDelivery }: DashboardScreenProps) {
             triggerHaptic("medium");
             onScheduleDelivery();
           }}
-          className="touch-press tile-press group flex min-h-[54px] w-full items-center gap-4 rounded-3xl bg-white p-5 text-left shadow-sm ring-1 ring-brand-navy/5 transition-all duration-150 hover:shadow-md hover:ring-electric/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-electric"
+          className="touch-press tile-press group relative z-10 flex min-h-[54px] w-full cursor-pointer items-center gap-4 rounded-3xl bg-white p-5 text-left shadow-sm ring-1 ring-brand-navy/5 transition-all duration-150 hover:shadow-md hover:ring-electric/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-electric"
         >
           <span className="flex h-[54px] w-[54px] shrink-0 items-center justify-center rounded-2xl bg-electric/15 text-electric">
             <Banknote className="h-6 w-6" aria-hidden="true" />

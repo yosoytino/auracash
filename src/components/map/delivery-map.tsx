@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import L from "leaflet";
 import {
   MapContainer,
@@ -28,14 +28,18 @@ type DeliveryMapProps = {
   hasArrived: boolean;
 };
 
-function MapViewportSync({ progress }: { progress: number }) {
+/** Fit map once on mount — avoid calling fitBounds every progress tick (crashes mobile). */
+function MapViewportSync() {
   const map = useMap();
+  const fittedRef = useRef(false);
 
   useEffect(() => {
-    const vehicle = interpolateRoute(progress);
-    const bounds = L.latLngBounds([...ROUTE_WAYPOINTS, vehicle]);
-    map.fitBounds(bounds, { padding: [52, 52], animate: true, duration: 0.6 });
-  }, [map, progress]);
+    if (fittedRef.current) return;
+    fittedRef.current = true;
+
+    const bounds = L.latLngBounds(ROUTE_WAYPOINTS);
+    map.fitBounds(bounds, { padding: [52, 52], animate: false });
+  }, [map]);
 
   return null;
 }
@@ -82,7 +86,7 @@ export function DeliveryMap({ progress, hasArrived }: DeliveryMapProps) {
   return (
     <MapContainer
       bounds={bounds}
-      className={`delivery-map h-full w-full ${useMapbox ? "delivery-map--mapbox" : "delivery-map--minimal"}`}
+      className={`delivery-map h-full min-h-[280px] w-full ${useMapbox ? "delivery-map--mapbox" : "delivery-map--minimal"}`}
       zoomControl={false}
       attributionControl={false}
       scrollWheelZoom={false}
@@ -94,8 +98,8 @@ export function DeliveryMap({ progress, hasArrived }: DeliveryMapProps) {
         url={useMapbox ? mapboxTileUrl : MINIMAL_TILE_URL}
         maxZoom={useMapbox ? 20 : 19}
         tileSize={512}
-        zoomOffset={useMapbox ? -1 : -1}
-        subdomains={useMapbox ? undefined : "abcd"}
+        zoomOffset={-1}
+        {...(useMapbox ? {} : { subdomains: "abcd" })}
       />
 
       <Polyline
@@ -130,7 +134,7 @@ export function DeliveryMap({ progress, hasArrived }: DeliveryMapProps) {
         />
       )}
 
-      <MapViewportSync progress={progress} />
+      <MapViewportSync />
 
       <div className="map-attribution pointer-events-none absolute bottom-1 right-2 z-[600] rounded bg-white/80 px-1.5 py-0.5 text-[9px] text-brand-navy/45">
         {useMapbox ? "© Mapbox © OpenStreetMap" : MINIMAL_TILE_ATTRIBUTION}
