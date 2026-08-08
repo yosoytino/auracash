@@ -70,7 +70,7 @@ body {
   animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* ── Leaflet map styling ── */
+/* ── Leaflet map styling (Instacart-like: muted, minimal line detail) ── */
 .delivery-map {
   background: var(--surface-light);
   z-index: 0;
@@ -78,11 +78,21 @@ body {
 
 .delivery-map .leaflet-container {
   font-family: var(--font-inter), system-ui, sans-serif;
-  background: #dce3ec;
+  background: #eef1f5;
 }
 
+/* Soft wash over tiles to reduce visual noise from road/label lines */
 .delivery-map .leaflet-tile-pane {
-  filter: saturate(0.85) contrast(1.05) brightness(1.02);
+  filter: saturate(0.48) contrast(0.88) brightness(1.14);
+}
+
+.delivery-map::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: rgba(244, 246, 249, 0.42);
+  z-index: 401;
 }
 
 .delivery-map::after {
@@ -92,36 +102,33 @@ body {
   pointer-events: none;
   background: linear-gradient(
     180deg,
-    rgba(10, 37, 64, 0.08) 0%,
-    transparent 28%,
-    transparent 72%,
-    rgba(10, 37, 64, 0.12) 100%
+    rgba(10, 37, 64, 0.06) 0%,
+    transparent 30%,
+    transparent 70%,
+    rgba(10, 37, 64, 0.08) 100%
   );
-  z-index: 400;
+  z-index: 402;
 }
 
-/* Mapbox-styled tiles — cleaner contrast, subtle brand tint */
+/* Mapbox token present — slightly richer but still muted */
 .delivery-map--mapbox .leaflet-tile-pane {
-  filter: saturate(0.92) contrast(1.1) brightness(1.04);
+  filter: saturate(0.52) contrast(0.9) brightness(1.12);
 }
 
-.delivery-map--mapbox::after {
-  background:
-    linear-gradient(
-      180deg,
-      rgba(10, 37, 64, 0.1) 0%,
-      transparent 24%,
-      transparent 68%,
-      rgba(10, 37, 64, 0.14) 100%
-    ),
-    radial-gradient(
-      ellipse at 50% 40%,
-      rgba(0, 210, 255, 0.06) 0%,
-      transparent 65%
-    );
+.delivery-map--mapbox::before {
+  background: rgba(244, 246, 249, 0.38);
 }
 
-.mapbox-attribution {
+/* Carto Positron fallback — already minimal; extra soften */
+.delivery-map--minimal .leaflet-tile-pane {
+  filter: saturate(0.45) contrast(0.85) brightness(1.16);
+}
+
+.delivery-map--minimal::before {
+  background: rgba(244, 246, 249, 0.48);
+}
+
+.map-attribution {
   font-family: var(--font-inter), system-ui, sans-serif;
   backdrop-filter: blur(4px);
 }

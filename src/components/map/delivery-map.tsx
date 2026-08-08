@@ -9,7 +9,12 @@ import {
   TileLayer,
   useMap,
 } from "react-leaflet";
-import { getMapboxTileUrl, isMapboxEnabled } from "@/lib/mapbox-config";
+import {
+  getMapboxTileUrl,
+  isMapboxEnabled,
+  MINIMAL_TILE_ATTRIBUTION,
+  MINIMAL_TILE_URL,
+} from "@/lib/mapbox-config";
 import {
   completedRoute,
   DESTINATION_COORDS,
@@ -23,15 +28,13 @@ type DeliveryMapProps = {
   hasArrived: boolean;
 };
 
-const OSM_TILE_URL = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
-
 function MapViewportSync({ progress }: { progress: number }) {
   const map = useMap();
 
   useEffect(() => {
     const vehicle = interpolateRoute(progress);
     const bounds = L.latLngBounds([...ROUTE_WAYPOINTS, vehicle]);
-    map.fitBounds(bounds, { padding: [36, 36], animate: true, duration: 0.6 });
+    map.fitBounds(bounds, { padding: [52, 52], animate: true, duration: 0.6 });
   }, [map, progress]);
 
   return null;
@@ -79,7 +82,7 @@ export function DeliveryMap({ progress, hasArrived }: DeliveryMapProps) {
   return (
     <MapContainer
       bounds={bounds}
-      className={`delivery-map h-full w-full ${useMapbox ? "delivery-map--mapbox" : ""}`}
+      className={`delivery-map h-full w-full ${useMapbox ? "delivery-map--mapbox" : "delivery-map--minimal"}`}
       zoomControl={false}
       attributionControl={false}
       scrollWheelZoom={false}
@@ -88,19 +91,21 @@ export function DeliveryMap({ progress, hasArrived }: DeliveryMapProps) {
       touchZoom={false}
     >
       <TileLayer
-        url={useMapbox ? mapboxTileUrl : OSM_TILE_URL}
-        maxZoom={useMapbox ? 22 : 19}
-        tileSize={useMapbox ? 512 : 256}
-        zoomOffset={useMapbox ? -1 : 0}
+        url={useMapbox ? mapboxTileUrl : MINIMAL_TILE_URL}
+        maxZoom={useMapbox ? 20 : 19}
+        tileSize={512}
+        zoomOffset={useMapbox ? -1 : -1}
+        subdomains={useMapbox ? undefined : "abcd"}
       />
 
       <Polyline
         positions={ROUTE_WAYPOINTS}
         pathOptions={{
-          color: "#00D2FF",
-          weight: 3,
-          opacity: 0.35,
-          dashArray: "8 8",
+          color: "#0A2540",
+          weight: 4,
+          opacity: 0.12,
+          lineCap: "round",
+          lineJoin: "round",
         }}
       />
 
@@ -108,8 +113,8 @@ export function DeliveryMap({ progress, hasArrived }: DeliveryMapProps) {
         positions={traveledRoute}
         pathOptions={{
           color: "#00D2FF",
-          weight: 5,
-          opacity: 0.95,
+          weight: 6,
+          opacity: 0.88,
           lineCap: "round",
           lineJoin: "round",
         }}
@@ -127,11 +132,9 @@ export function DeliveryMap({ progress, hasArrived }: DeliveryMapProps) {
 
       <MapViewportSync progress={progress} />
 
-      {useMapbox && (
-        <div className="mapbox-attribution pointer-events-none absolute bottom-1 right-2 z-[600] rounded bg-white/80 px-1.5 py-0.5 text-[9px] text-brand-navy/50">
-          © Mapbox © OpenStreetMap
-        </div>
-      )}
+      <div className="map-attribution pointer-events-none absolute bottom-1 right-2 z-[600] rounded bg-white/80 px-1.5 py-0.5 text-[9px] text-brand-navy/45">
+        {useMapbox ? "© Mapbox © OpenStreetMap" : MINIMAL_TILE_ATTRIBUTION}
+      </div>
     </MapContainer>
   );
 }

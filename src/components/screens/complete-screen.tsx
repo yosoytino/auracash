@@ -13,28 +13,28 @@ type CompleteScreenProps = {
 
 const springBounce = {
   type: "spring" as const,
-  stiffness: 380,
-  damping: 22,
-  mass: 0.9,
+  stiffness: 340,
+  damping: 18,
+  mass: 0.95,
 };
 
 const springSoft = {
   type: "spring" as const,
-  stiffness: 320,
-  damping: 32,
-  mass: 0.85,
+  stiffness: 300,
+  damping: 28,
+  mass: 0.9,
 };
 
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.08, delayChildren: 0.05 },
+    transition: { staggerChildren: 0.1, delayChildren: 0.38 },
   },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 16 },
+  hidden: { opacity: 0, y: 22 },
   visible: {
     opacity: 1,
     y: 0,
@@ -46,7 +46,7 @@ export function CompleteScreen({ amount, onReturnHome }: CompleteScreenProps) {
   const reduceMotion = useReducedMotion();
 
   return (
-    <div className="relative flex min-h-full flex-col items-center justify-center overflow-hidden px-5 py-12">
+    <div className="relative flex min-h-full flex-col items-center justify-center px-5 py-12">
       <SuccessConfetti />
 
       <motion.div
@@ -60,8 +60,8 @@ export function CompleteScreen({ amount, onReturnHome }: CompleteScreenProps) {
           variants={reduceMotion ? undefined : itemVariants}
         >
           <motion.span
-            className="flex h-24 w-24 items-center justify-center rounded-full bg-success/15"
-            initial={reduceMotion ? false : { scale: 0.5, rotate: -12 }}
+            className="flex h-24 w-24 items-center justify-center rounded-full bg-success/15 ring-4 ring-success/10"
+            initial={reduceMotion ? false : { scale: 0.35, rotate: -18 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={reduceMotion ? { duration: 0.15 } : springBounce}
           >
@@ -72,17 +72,17 @@ export function CompleteScreen({ amount, onReturnHome }: CompleteScreenProps) {
             />
           </motion.span>
           <motion.span
-            initial={reduceMotion ? false : { scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
+            initial={reduceMotion ? false : { scale: 0, opacity: 0, rotate: -90 }}
+            animate={{ scale: 1, opacity: 1, rotate: 0 }}
             transition={
               reduceMotion
                 ? { duration: 0.15 }
-                : { ...springBounce, delay: 0.18 }
+                : { ...springBounce, delay: 0.22 }
             }
             className="absolute -bottom-1 -right-1"
           >
             <CheckCircle2
-              className="h-8 w-8 rounded-full bg-white text-success"
+              className="h-8 w-8 rounded-full bg-white text-success shadow-sm"
               aria-hidden="true"
             />
           </motion.span>
