@@ -1,6 +1,8 @@
 "use client";
 
+import { motion, useReducedMotion } from "framer-motion";
 import { CheckCircle2, Home, LockOpen, MapPin } from "lucide-react";
+import { SuccessConfetti } from "@/components/ui/success-confetti";
 import { TouchTarget } from "@/components/ui/touch-target";
 import { DELIVERY_ADDRESS, formatCurrency } from "@/lib/flow-state";
 
@@ -9,36 +11,105 @@ type CompleteScreenProps = {
   onReturnHome: () => void;
 };
 
+const springBounce = {
+  type: "spring" as const,
+  stiffness: 380,
+  damping: 22,
+  mass: 0.9,
+};
+
+const springSoft = {
+  type: "spring" as const,
+  stiffness: 320,
+  damping: 32,
+  mass: 0.85,
+};
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08, delayChildren: 0.05 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: springSoft,
+  },
+};
+
 export function CompleteScreen({ amount, onReturnHome }: CompleteScreenProps) {
+  const reduceMotion = useReducedMotion();
+
   return (
-    <div className="flex min-h-full flex-col items-center justify-center px-5 py-12">
-      <div className="flex w-full max-w-sm flex-col items-center text-center">
-        <div className="relative mb-6">
-          <span className="flex h-24 w-24 items-center justify-center rounded-full bg-success/15">
+    <div className="relative flex min-h-full flex-col items-center justify-center overflow-hidden px-5 py-12">
+      <SuccessConfetti />
+
+      <motion.div
+        className="flex w-full max-w-sm flex-col items-center text-center"
+        variants={reduceMotion ? undefined : containerVariants}
+        initial={reduceMotion ? false : "hidden"}
+        animate="visible"
+      >
+        <motion.div
+          className="relative mb-6"
+          variants={reduceMotion ? undefined : itemVariants}
+        >
+          <motion.span
+            className="flex h-24 w-24 items-center justify-center rounded-full bg-success/15"
+            initial={reduceMotion ? false : { scale: 0.5, rotate: -12 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={reduceMotion ? { duration: 0.15 } : springBounce}
+          >
             <LockOpen
               className="h-12 w-12 text-success"
               aria-hidden="true"
               strokeWidth={2}
             />
-          </span>
-          <CheckCircle2
-            className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full bg-white text-success"
-            aria-hidden="true"
-          />
-        </div>
+          </motion.span>
+          <motion.span
+            initial={reduceMotion ? false : { scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={
+              reduceMotion
+                ? { duration: 0.15 }
+                : { ...springBounce, delay: 0.18 }
+            }
+            className="absolute -bottom-1 -right-1"
+          >
+            <CheckCircle2
+              className="h-8 w-8 rounded-full bg-white text-success"
+              aria-hidden="true"
+            />
+          </motion.span>
+        </motion.div>
 
-        <span className="font-display mb-3 inline-flex min-h-[54px] items-center rounded-full bg-success/15 px-5 text-sm font-bold tracking-wide text-success">
+        <motion.span
+          variants={reduceMotion ? undefined : itemVariants}
+          className="font-display mb-3 inline-flex min-h-[54px] items-center rounded-full bg-success/15 px-5 text-sm font-bold tracking-wide text-success"
+        >
           Delivered
-        </span>
+        </motion.span>
 
-        <h1 className="font-display text-2xl font-bold text-brand-navy">
+        <motion.h1
+          variants={reduceMotion ? undefined : itemVariants}
+          className="font-display text-2xl font-bold text-brand-navy"
+        >
           Cash unlocked
-        </h1>
-        <p className="font-body mt-2 text-base text-brand-navy/60">
+        </motion.h1>
+        <motion.p
+          variants={reduceMotion ? undefined : itemVariants}
+          className="font-body mt-2 text-base text-brand-navy/60"
+        >
           Your withdrawal is ready. Thank you for using AuraCash.
-        </p>
+        </motion.p>
 
-        <section
+        <motion.section
+          variants={reduceMotion ? undefined : itemVariants}
           aria-label="Transaction summary"
           className="mt-8 w-full rounded-3xl bg-white p-6 text-left shadow-sm ring-1 ring-brand-navy/5"
         >
@@ -70,15 +141,18 @@ export function CompleteScreen({ amount, onReturnHome }: CompleteScreenProps) {
               </span>
             </div>
           </div>
-        </section>
+        </motion.section>
 
-        <div className="mt-8 w-full">
+        <motion.div
+          variants={reduceMotion ? undefined : itemVariants}
+          className="mt-8 w-full"
+        >
           <TouchTarget variant="primary" fullWidth onClick={onReturnHome}>
             <Home className="h-5 w-5" aria-hidden="true" />
             Return to home
           </TouchTarget>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }
