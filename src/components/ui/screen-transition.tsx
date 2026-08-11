@@ -7,10 +7,12 @@ import type { FlowStage } from "@/lib/flow-state";
 export type TransitionDirection = "forward" | "back";
 
 const STAGE_ORDER: Record<FlowStage, number> = {
-  dashboard: 0,
-  assistant: 1,
-  tracker: 2,
-  complete: 3,
+  bank_home: 0,
+  dashboard: 1,
+  assistant: 2,
+  tracker: 3,
+  complete: 4,
+  cancelled: 4,
 };
 
 export function getTransitionDirection(

@@ -4,9 +4,12 @@ import { motion, useReducedMotion } from "framer-motion";
 import { CheckCircle2, Home, LockOpen, MapPin } from "lucide-react";
 import { SuccessConfetti } from "@/components/ui/success-confetti";
 import { TouchTarget } from "@/components/ui/touch-target";
+import { PoweredByBadge } from "@/components/bank/powered-by-badge";
+import type { BankConfig } from "@/lib/bank-config";
 import { DELIVERY_ADDRESS, formatCurrency } from "@/lib/flow-state";
 
 type CompleteScreenProps = {
+  bank: BankConfig;
   amount: number;
   onReturnHome: () => void;
 };
@@ -42,7 +45,11 @@ const itemVariants = {
   },
 };
 
-export function CompleteScreen({ amount, onReturnHome }: CompleteScreenProps) {
+export function CompleteScreen({
+  bank,
+  amount,
+  onReturnHome,
+}: CompleteScreenProps) {
   const reduceMotion = useReducedMotion();
 
   return (
@@ -149,8 +156,12 @@ export function CompleteScreen({ amount, onReturnHome }: CompleteScreenProps) {
         >
           <TouchTarget variant="primary" fullWidth onClick={onReturnHome}>
             <Home className="h-5 w-5" aria-hidden="true" />
-            Return to home
+            Return to {bank.name}
           </TouchTarget>
+        </motion.div>
+
+        <motion.div variants={reduceMotion ? undefined : itemVariants} className="mt-4">
+          <PoweredByBadge bank={bank} variant="footer" />
         </motion.div>
       </motion.div>
     </div>

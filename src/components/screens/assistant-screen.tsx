@@ -1,8 +1,10 @@
 "use client";
 
-import { Bot, MapPin } from "lucide-react";
+import { ArrowLeft, Bot, MapPin } from "lucide-react";
+import { PoweredByBadge } from "@/components/bank/powered-by-badge";
 import { PressableChip } from "@/components/ui/pressable-chip";
 import { TouchTarget } from "@/components/ui/touch-target";
+import type { BankConfig } from "@/lib/bank-config";
 import {
   DELIVERY_ADDRESS,
   type BillDenomination,
@@ -12,21 +14,25 @@ import {
 import { triggerHaptic } from "@/lib/haptics";
 
 type AssistantScreenProps = {
+  bank: BankConfig;
   amount: number;
   denomination: BillDenomination;
   onAmountChange: (amount: number) => void;
   onDenominationChange: (denomination: BillDenomination) => void;
   onConfirm: () => void;
+  onBack: () => void;
 };
 
 const DENOMINATIONS: BillDenomination[] = [5, 10, 20];
 
 export function AssistantScreen({
+  bank,
   amount,
   denomination,
   onAmountChange,
   onDenominationChange,
   onConfirm,
+  onBack,
 }: AssistantScreenProps) {
   const billCount = amount / denomination;
   const isValidAmount = amount > 0 && amount % denomination === 0;
@@ -34,6 +40,17 @@ export function AssistantScreen({
   return (
     <div className="flex min-h-full flex-col">
       <header className="border-b border-brand-navy/8 bg-white px-5 py-4">
+        <div className="mb-3 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onBack}
+            aria-label={`Back to ${bank.name}`}
+            className="touch-press flex h-[54px] w-[54px] shrink-0 items-center justify-center rounded-2xl text-brand-navy/70 hover:bg-brand-navy/5"
+          >
+            <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+          </button>
+          <PoweredByBadge bank={bank} />
+        </div>
         <div className="flex items-center gap-3">
           <span className="flex h-[54px] w-[54px] items-center justify-center rounded-2xl bg-electric/15">
             <Bot className="h-6 w-6 text-electric" aria-hidden="true" />
